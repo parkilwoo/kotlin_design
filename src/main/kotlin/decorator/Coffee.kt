@@ -43,4 +43,33 @@ class Latte: Coffee {
     override fun getDescription(): String = "Latte"
 }
 
-// Decorator: 다른
+// Decorator: Component를 장식하기 위한 추상 클래스. 쉽게 말해 '토핑'의 기본 틀.
+// Component를 인자로 받아 내부에서 해당 Component의 객체에 대한 참조를 가진다.
+abstract class CoffeeDecorator(private val decoratedCoffee: Coffee): Coffee {
+    override fun getCost(): Int = decoratedCoffee.getCost()
+    override fun getDescription(): String = decoratedCoffee.getDescription()
+}
+
+// ConcreteDecorator: 구체적인 Decorator 구현체. 쉽게 말해 '시럽 추가, 샷 추가, 우유 추가'
+class MilkDecorator(coffee: Coffee): CoffeeDecorator(coffee) {
+    override fun getCost(): Int = super.getCost() + 500
+    override fun getDescription(): String = super.getDescription() + ", 우유"
+}
+class SyrupDecorator(coffee: Coffee): CoffeeDecorator(coffee) {
+    override fun getCost(): Int = super.getCost() + 300
+    override fun getDescription(): String =  super.getDescription() + ", 시럽"
+}
+
+fun main() {
+    // 1. 장식이 될 기본 객체
+    val americano: Coffee = Americano()
+    println("주문: ${americano.getDescription()}, 가격: ${americano.getCost()}원")
+
+    // 2. 라떼에 우유를 추가
+    val latte: Coffee = MilkDecorator(Latte())
+    println("주문: ${latte.getDescription()}, 가격: ${latte.getCost()}원")
+
+    // 3. 2번에서 만든 라떼에 시럽을 추가
+    val syrupLatte: Coffee = SyrupDecorator(latte)
+    println("주문: ${syrupLatte.getDescription()}, 가격: ${syrupLatte.getCost()}원")
+}
